@@ -50,7 +50,6 @@ var getEndAngle = function(index) {
 
 var offset = 0.03; // 为空隙准备的
 
-
 var radius = config.radius;
 var chart = d3.select("svg")
         .attr("width", radius * 2)
@@ -60,6 +59,17 @@ var chart = d3.select("svg")
         .style("box-shadow", "0 0 8px #777")
         .append("g")
         .style("transition", "2s");
+
+// todo: 按照根号关系画线
+chart.data([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+    .enter()
+    .append("svg:circle")
+    .attr("cx", 0)
+    .attr("cy", 0)
+    .attr("fill", "black")
+    .attr("r", function(d, i) {
+        return Math.sqrt(d) * config.radius;
+    });
 
 chart.selectAll(".arc")
     .data(config.data)
