@@ -1,6 +1,6 @@
 var config = {
-    radius: 200,
-    innerRadius: 50,
+    radius: 220,
+    innerRadius: 90,
     data: [
         {
             name: "浏览",
@@ -48,30 +48,60 @@ var getEndAngle = function(index) {
     return Math.PI * 2 * config.data[index].weight + getStartAngle(index);
 }
 
-var offset = 0.03; // 为空隙准备的
+var offset = 0.06; // 为空隙准备的
 
 var radius = config.radius;
-var chart = d3.select("svg")
+var svg = d3.select("svg")
         .attr("width", radius * 2)
-        .attr("height", radius * 2)
-        .append("g")
+        .attr("height", radius * 2);
+var filter = svg.appned("defs")
+        .append("filter")
+        .attr("id", "shadow")
+        .append("feGaussianBlur")
+        .attr("stdDeviation", 5);
+var chart = svg.append("g")
         .attr("transform", "translate(" + radius + ", " + radius + ")")
-        .style("box-shadow", "0 0 8px #777")
-        .append("g")
-        .style("transition", "2s");
+        .style("box-shadow", "0 0 8px #777");
 
-// todo: 按照根号关系画线
-chart.data([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+var calcRadius = function(score) {
+    return (config.radius - config.innerRadius) * Math.sqrt(score) + config.innerRadius;
+}
+
+chart.selectAll(".circle")
+    .data([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     .enter()
     .append("svg:circle")
     .attr("cx", 0)
     .attr("cy", 0)
-    .attr("fill", "black")
+    .attr("stroke", function(d, i) {
+        return i % 2 == 0 ? "#999" : "#ccc";
+    })
+    .attr("stroke-width", 1)
+    .attr("fill", "transparent")
     .attr("r", function(d, i) {
-        return Math.sqrt(d) * config.radius;
+        return calcRadius(d);
     });
 
-chart.selectAll(".arc")
+chart.selectAll(".text")
+    .data([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    .enter()
+    .append("svg:text")
+    .attr("x", function(d, i) {
+        return i > 0 ? -6 : -3;
+    })
+    .attr("y", function(d, i) {
+        return (calcRadius(d) + 2) * -1;
+    })
+    .attr("font-size", "12px")
+    .attr("fill", "#777")
+    .text(function(d, i) {
+        return d * 100;
+    });
+
+var fg = chart.append("g")
+    .style("transition", "2s");
+
+fg.selectAll(".arc")
     .data(config.data)
     .enter()
     .append("svg:path")
@@ -93,7 +123,7 @@ chart.selectAll(".arc")
         var arc = d3.svg.arc();
         // 近似用单位面积表示 score
         arc.innerRadius(config.innerRadius);
-        arc.outerRadius((config.radius - config.innerRadius) * Math.sqrt(d.score) + config.innerRadius);
+        arc.outerRadius(calcRadius(d.score));
         arc.startAngle(getStartAngle(i) + offset);
         arc.endAngle(getEndAngle(i) - offset);
         return arc();
@@ -130,7 +160,7 @@ var switchTo = function(index) {
     // apply
     currentRotateAngle += rotateAngleOffset;
     currentIndex = index;
-    chart.style("transform", "rotate(" + currentRotateAngle + "rad)");
+    fg.style("transform", "rotate(" + currentRotateAngle + "rad)");
 }
 
 var targets = document.querySelectorAll('svg path');
