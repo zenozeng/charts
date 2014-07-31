@@ -1,3 +1,6 @@
+// TODO：再调整一下阴影
+
+
 var config = {
     radius: 220,
     innerRadius: 90,
@@ -54,11 +57,31 @@ var radius = config.radius;
 var svg = d3.select("svg")
         .attr("width", radius * 2)
         .attr("height", radius * 2);
-var filter = svg.appned("defs")
+var filter = svg.append("defs")
         .append("filter")
         .attr("id", "shadow")
-        .append("feGaussianBlur")
-        .attr("stdDeviation", 5);
+        .attr("height", "130%"); // so that the shadow is not clipped
+filter.append("feGaussianBlur")
+    .attr("in", "SourceAlpha")
+    .attr("stdDeviation", 3)
+    .attr("result", "blur");
+
+// opacity
+filter.append("feComponentTransfer")
+    .append("feFuncA")
+    .attr("type", "linear")
+    .attr("slope", "0.2");
+
+
+// overlay original SourceGraphic over translated blurred opacity by using
+// feMerge filter. Order of specifying inputs is important!
+var feMerge = filter.append("feMerge");
+
+feMerge.append("feMergeNode")
+    .attr("in", "blur")
+feMerge.append("feMergeNode")
+    .attr("in", "SourceGraphic");
+
 var chart = svg.append("g")
         .attr("transform", "translate(" + radius + ", " + radius + ")")
         .style("box-shadow", "0 0 8px #777");
@@ -130,7 +153,8 @@ fg.selectAll(".arc")
     })
     .attr("data-index", function(d, i) {
         return i;
-    });
+    })
+    .style("filter", "url(#shadow)");
 
 
 var currentIndex = 0;
