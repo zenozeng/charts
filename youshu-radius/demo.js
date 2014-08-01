@@ -33,6 +33,10 @@ var config = {
     ]
 }
 
+var width = config.radius * 2 * 1.3;
+var height = width;
+
+var bg = "#D3DCE0";
 var colors = ["#ffbd00", "#bdd100", "#ff7d00", "#ed1a00", "#74c2c0"];
 var darkColors = ["#e1a300", "#9fb700", "#e16300", "#850000", "#1f7887"];
 
@@ -55,8 +59,8 @@ var offset = 0.06; // 为空隙准备的
 
 var radius = config.radius;
 var svg = d3.select("svg")
-        .attr("width", radius * 2)
-        .attr("height", radius * 2);
+        .attr("width", width)
+        .attr("height", height);
 var filter = svg.append("defs")
         .append("filter")
         .attr("id", "shadow")
@@ -83,7 +87,7 @@ feMerge.append("feMergeNode")
     .attr("in", "SourceGraphic");
 
 var chart = svg.append("g")
-        .attr("transform", "translate(" + radius + ", " + radius + ")")
+        .attr("transform", "translate(" + width / 2 + ", " + height / 2 + ")")
         .style("box-shadow", "0 0 8px #777");
 
 var calcRadius = function(score) {
@@ -91,16 +95,16 @@ var calcRadius = function(score) {
 }
 
 chart.selectAll(".circle")
-    .data([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    .data([0, 0.2, 0.4, 0.6, 0.8, 1.0].reverse())
     .enter()
     .append("svg:circle")
     .attr("cx", 0)
     .attr("cy", 0)
     .attr("stroke", function(d, i) {
-        return i % 2 == 0 ? "#999" : "#ccc";
+        return i % 2 == 0 ? "#56463E" : "#BDC2C3";
     })
+    .attr("fill", bg)
     .attr("stroke-width", 1)
-    .attr("fill", "transparent")
     .attr("r", function(d, i) {
         return calcRadius(d);
     });
@@ -109,11 +113,9 @@ chart.selectAll(".text")
     .data([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     .enter()
     .append("svg:text")
-    .attr("x", function(d, i) {
-        return i > 0 ? -6 : -3;
-    })
+    .attr("text-anchor", "middle")
     .attr("y", function(d, i) {
-        return (calcRadius(d) + 2) * -1;
+        return (calcRadius(d) + 3) * -1;
     })
     .attr("font-size", "12px")
     .attr("fill", "#777")
@@ -122,7 +124,23 @@ chart.selectAll(".text")
     });
 
 var fg = chart.append("g")
-    .style("transition", "2s");
+        .style("transition", "all 2s");
+
+var labels = chart.append("g")
+        .style("transition", "all 1s");
+
+
+labels.selectAll(".label")
+    .data(config.data)
+    .enter()
+    .append("svg:text")
+    .attr("class", "label")
+    .attr("font-size", "16px")
+    .attr("fill", "#56463E")
+    .attr("text-anchor", "middle")
+    .text(function(d, i) {
+        return d.name;
+    });
 
 fg.selectAll(".arc")
     .data(config.data)
@@ -159,6 +177,22 @@ fg.selectAll(".arc")
 
 var currentIndex = 0;
 var currentRotateAngle = 0;
+var updateLabels = function(angleOffset) {
+    labels.style("opacity", 0);
+    setTimeout(function() {
+        labels.selectAll(".label")
+            .data(config.data)
+            .attr("x", function(d, i) {
+                var angle = (getStartAngle(i) + getEndAngle(i)) / 2 + angleOffset;
+                return config.radius * 1.15 * Math.sin(angle);
+            })
+            .attr("y", function(d, i) {
+                var angle = (getStartAngle(i) + getEndAngle(i)) / 2 + angleOffset;
+                return config.radius * 1.15 * Math.cos(angle) * -1;
+            });
+        labels.style("opacity", 1);
+    }, 1000);
+}
 var switchTo = function(index) {
     index = index % config.data.length;
     var rotateAngleOffset = 0;
@@ -185,7 +219,11 @@ var switchTo = function(index) {
     currentRotateAngle += rotateAngleOffset;
     currentIndex = index;
     fg.style("transform", "rotate(" + currentRotateAngle + "rad)");
+    fg.selectAll(".label").style("transform", "rotate(" + -1 * currentRotateAngle + "rad)");
+    updateLabels(currentRotateAngle);
 }
+
+switchTo(0);
 
 var targets = document.querySelectorAll('svg path');
 for(var i = 0; i < targets.length; i++) {
