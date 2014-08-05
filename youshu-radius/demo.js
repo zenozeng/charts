@@ -32,8 +32,8 @@ var config = {
     ]
 }
 
-var width = config.radius * 2 * 2.2;
-var height = config.radius * 2 * 1.5;
+var width = config.radius * 2 * 1.5;
+var height = config.radius * 2 * 1.2;
 
 var bg = "#f2f2f2";
 var colors = ["#ffbd00", "#bdd100", "#ff7d00", "#ed1a00", "#74c2c0"];
@@ -172,9 +172,9 @@ fg.selectAll(".arc")
     .style("filter", "url(#shadow)");
 
 var points = [
-    [width / 2 + 30, height / 3.5],
-    [width / 1.6, height / 6],
-    [width / 1.2, height / 6]
+    [width / 2 + 30, height / 4],
+    [width / 1.6, height / 10],
+    [width / 1 - 10, height / 10]
 ]
 
 var line = svg.append('g');
@@ -188,20 +188,18 @@ line.append("circle").attr("fill", "#624D3E").attr("cx", points[0][0]).attr("cy"
 line.append("circle").attr("fill", "#FFFFFF").attr("cx", points[0][0]).attr("cy", points[0][1]).attr("r", 3.841 * 2);
 line.append("circle").attr("fill", "#624D3E").attr("cx", points[2][0]).attr("cy", points[2][1]).attr("r", 3.415 * 2);
 
-var scoreBox = svg.append('g')
-        .attr("transform", "translate(" + (points[2][0] + 48) + ", " + (points[2][1] + 12) + ")")
-        .style("width", "200px");
-var score = scoreBox.append('text')
-        .attr("font-size", "48px")
-        .attr("fill", "#777")
-        .text(30);
-var scoreText = scoreBox.append('text')
-        .attr("font-size", "16px")
-        .attr("dy", "32px")
-        .attr("fill", "#777")
-        .html(function() {
-            return "<tspan>粘性分数为负数。</tspan><tspan x='0' dy='32px'>还是需要努力地呢。还是需要努力地呢。还是需要努力地呢。</tsapn>"
-        });
+var score = 30,
+    scoreText = "粘性分数为负数。还是需要努力地呢。还是需要努力地呢。还是需要努力地呢。";
+
+
+var scoreBox = document.createElement('div');
+scoreBox.style.display = "inline-block";
+scoreBox.style.verticalAlign = "top";
+scoreBox.style.marginTop = height / 10 - 20 + "px";
+scoreBox.style.marginLeft = 30 + "px";
+scoreBox.innerHTML = "<div class='youshu-radius-score' style='font-size:32px'>30</div>";
+scoreBox.innerHTML += "<div class='youshu-radius-score-text' style='font-size:16px; width: 200px;'>" + scoreText + "</div>";
+document.body.appendChild(scoreBox);
 
 
 var currentIndex = 0;
