@@ -60,33 +60,21 @@ var radius = config.radius;
 var svg = d3.select("svg")
         .attr("width", width)
         .attr("height", height);
-var filter = svg.append("defs")
-        .append("filter")
-        .attr("id", "shadow")
-        .attr("height", "130%"); // so that the shadow is not clipped
-filter.append("feGaussianBlur")
-    .attr("in", "SourceAlpha")
-    .attr("stdDeviation", 3)
-    .attr("result", "blur");
+var defs = svg.append("defs");
 
-// opacity
-filter.append("feComponentTransfer")
-    .append("feFuncA")
-    .attr("type", "linear")
-    .attr("slope", "0.2");
-
-// overlay original SourceGraphic over translated blurred opacity by using
-// feMerge filter. Order of specifying inputs is important!
-var feMerge = filter.append("feMerge");
-
-feMerge.append("feMergeNode")
-    .attr("in", "blur")
-feMerge.append("feMergeNode")
-    .attr("in", "SourceGraphic");
+defs.html('<filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%"> \
+    <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="8" /> \
+    <feOffset in="blur-out" result="the-shadow" dx="0" dy="5"/> \
+    <feColorMatrix in="the-shadow" result="color-out" type="matrix" \
+      values="0 0 0 0 0 \
+              0 0 0 0 0 \
+              0 0 0 0 0 \
+              0 0 0 .3 0"/> \
+    <feBlend in="SourceGraphic" in2="color-out" mode="normal"/> \
+  </filter>');
 
 var chart = svg.append("g")
-        .attr("transform", "translate(" + width / 2 + ", " + height / 2 + ")")
-        .style("box-shadow", "0 0 8px #777");
+        .attr("transform", "translate(" + width / 2 + ", " + height / 2 + ")");
 
 var calcRadius = function(score) {
     return (config.radius - config.innerRadius) * Math.sqrt(score) + config.innerRadius;
@@ -169,7 +157,7 @@ fg.selectAll(".arc")
     .attr("data-index", function(d, i) {
         return i;
     })
-    .style("filter", "url(#shadow)");
+    .style("filter", "url(#drop-shadow)");
 
 var points = [
     [width / 2 + 30, height / 4],
