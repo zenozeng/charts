@@ -1,6 +1,5 @@
 // TODO：再调整一下阴影
 
-
 var config = {
     radius: 220,
     innerRadius: 90,
@@ -33,10 +32,10 @@ var config = {
     ]
 }
 
-var width = config.radius * 2 * 1.3;
-var height = width;
+var width = config.radius * 2 * 2.2;
+var height = config.radius * 2 * 1.5;
 
-var bg = "#D3DCE0";
+var bg = "#f2f2f2";
 var colors = ["#ffbd00", "#bdd100", "#ff7d00", "#ed1a00", "#74c2c0"];
 var darkColors = ["#e1a300", "#9fb700", "#e16300", "#850000", "#1f7887"];
 
@@ -75,7 +74,6 @@ filter.append("feComponentTransfer")
     .append("feFuncA")
     .attr("type", "linear")
     .attr("slope", "0.2");
-
 
 // overlay original SourceGraphic over translated blurred opacity by using
 // feMerge filter. Order of specifying inputs is important!
@@ -129,7 +127,6 @@ var fg = chart.append("g")
 var labels = chart.append("g")
         .style("transition", "all 1s");
 
-
 labels.selectAll(".label")
     .data(config.data)
     .enter()
@@ -174,6 +171,38 @@ fg.selectAll(".arc")
     })
     .style("filter", "url(#shadow)");
 
+var points = [
+    [width / 2 + 30, height / 3.5],
+    [width / 1.6, height / 6],
+    [width / 1.2, height / 6]
+]
+
+var line = svg.append('g');
+line.append("polyline")
+    .attr("fill", "none")
+    .attr("stroke", "#624D3E")
+    .attr("stroke-width", 2)
+    .attr("stroke-miterlimit", "10")
+    .attr("points", points.map(function(arr) {return arr.join(",")}).join(" "));
+line.append("circle").attr("fill", "#624D3E").attr("cx", points[0][0]).attr("cy", points[0][1]).attr("r", 8.536 * 2);
+line.append("circle").attr("fill", "#FFFFFF").attr("cx", points[0][0]).attr("cy", points[0][1]).attr("r", 3.841 * 2);
+line.append("circle").attr("fill", "#624D3E").attr("cx", points[2][0]).attr("cy", points[2][1]).attr("r", 3.415 * 2);
+
+var scoreBox = svg.append('g')
+        .attr("transform", "translate(" + (points[2][0] + 48) + ", " + (points[2][1] + 12) + ")")
+        .style("width", "200px");
+var score = scoreBox.append('text')
+        .attr("font-size", "48px")
+        .attr("fill", "#777")
+        .text(30);
+var scoreText = scoreBox.append('text')
+        .attr("font-size", "16px")
+        .attr("dy", "32px")
+        .attr("fill", "#777")
+        .html(function() {
+            return "<tspan>粘性分数为负数。</tspan><tspan x='0' dy='32px'>还是需要努力地呢。还是需要努力地呢。还是需要努力地呢。</tsapn>"
+        });
+
 
 var currentIndex = 0;
 var currentRotateAngle = 0;
@@ -193,6 +222,7 @@ var updateLabels = function(angleOffset) {
         labels.style("opacity", 1);
     }, 1000);
 }
+
 var switchTo = function(index) {
     index = index % config.data.length;
     var rotateAngleOffset = 0;
