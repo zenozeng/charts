@@ -108,6 +108,19 @@ chart.selectAll(".data")
     .data(data)
     .enter()
     .append("svg:path")
+    .attr("fill", function(d, i) {
+        return config.colors[i % config.colors.length];
+    })
+    .style("opacity", config.opacity)
+    .attr("stroke-width", 0)
+    .attr("d", function(d, i) {
+        var points = config.dimensions.map(function(dimension, index, array) {
+            return "0 0";
+        });
+        return "M" + points.join(" L");
+    })
+    .transition()
+    .duration(2500)
     .attr("d", function(d, i) {
         var points = config.dimensions.map(function(dimension, index, array) {
             var angle, x, y;
@@ -117,12 +130,7 @@ chart.selectAll(".data")
             return x + " " + y;
         });
         return "M" + points.join(" L");
-    })
-    .attr("fill", function(d, i) {
-        return config.colors[i % config.colors.length];
-    })
-    .style("opacity", config.opacity)
-    .attr("stroke-width", 0)
+    });
 
 ////////////////////////
 //
