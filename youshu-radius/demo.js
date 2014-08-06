@@ -59,17 +59,33 @@ var svg = d3.select("svg")
         .attr("width", width)
         .attr("height", height);
 var defs = svg.append("defs");
+var dropShadow = defs.append("svg:filter")
+        .attr("id", "drop-shadow")
+        .attr("x", "-20%")
+        .attr("y", "-20%")
+        .attr("width", "140%")
+        .attr("height", "140%");
+dropShadow.append("svg:feGaussianBlur")
+    .attr("in", "SourceAlpha")
+    .attr("result", "blur-out")
+    .attr("stdDeviation", 8);
 
-defs.html('<filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%"> \
-    <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="8" /> \
-    <feOffset in="blur-out" result="the-shadow" dx="0" dy="5"/> \
-    <feColorMatrix in="the-shadow" result="color-out" type="matrix" \
-      values="0 0 0 0 0 \
-              0 0 0 0 0 \
-              0 0 0 0 0 \
-              0 0 0 .3 0"/> \
-    <feBlend in="SourceGraphic" in2="color-out" mode="normal"/> \
-  </filter>');
+dropShadow.append("svg:feOffset")
+    .attr("in", "blur-out")
+    .attr("result", "the-shadow")
+    .attr("dx", 0)
+    .attr("dy", 5);
+
+dropShadow.append("svg:feColorMatrix")
+    .attr("in", "the-shadow")
+    .attr("result", "color-out")
+    .attr("type", "matrix")
+    .attr("values", "0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .3 0");
+
+dropShadow.append("svg:feBlend")
+    .attr("in", "SourceGraphic")
+    .attr("in2", "color-out")
+    .attr("mode", "normal");
 
 var chart = svg.append("g")
         .attr("transform", "translate(" + width / 2 + ", " + height / 2 + ")");
