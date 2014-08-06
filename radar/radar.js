@@ -31,7 +31,7 @@ chart.selectAll(".circle")
         return d * radius;
     })
     .style("opacity", function(d, i) {
-        return d <= 1 ? config.opacity : 1;
+        return d <= 1 ? config.backgroundOpacity : 1;
     });
 
 ////////////////////////
@@ -104,6 +104,7 @@ chart.selectAll(".data")
     .attr("fill", function(d, i) {
         return config.colors[i % config.colors.length];
     })
+    .style("opacity", config.opacity)
     .attr("stroke-width", 0)
 
 ////////////////////////
@@ -117,7 +118,7 @@ chart.append("svg:circle")
     .attr("cy", 0)
     .attr("stroke", config.stroke)
     .attr("fill", config.stroke)
-    .style("opacity", config.opacity)
+    .style("opacity", config.backgroundOpacity)
     .attr("stroke-width", 1)
     .attr("r", 5);
 
@@ -135,6 +136,6 @@ chart.selectAll(".dimension-line")
     })
     .attr("stroke", config.stroke)
     .attr("fill", config.stroke)
-    .style("opacity", config.opacity)
+    .style("opacity", config.backgroundOpacity)
     .attr("stroke-width", 1)
 

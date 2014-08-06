@@ -20,7 +20,8 @@ var config = {
     colors: ["#EA6760", "#66B9BC"],
     stroke: "#fff",
     background: "#fff",
-    opacity: .3,
+    opacity: .7,
+    backgroundOpacity: .3,
     dimensions: [
         {
             name: "吸引力",
