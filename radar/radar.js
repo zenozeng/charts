@@ -48,6 +48,23 @@ var dimensionPoints = config.dimensions.map(function(dimension, index, array) {
     return {x: x, y: y}
 });
 
+for(var i = 0; i < config.dimensions.length; i++) {
+    var angle, x, y;
+    var dimension = config.dimensions[i];
+    angle = i / config.dimensions.length * Math.PI * 2;
+    x = radius * Math.sin(angle);
+    y = radius * Math.cos(angle) * -1;
+    [0, 0.4, 0.6, 0.8, 1.0].forEach(function(elem) {
+        console.log(elem);
+        chart.append("svg:text")
+            .attr("x", x * elem).attr("y", y * elem)
+            .attr("stroke", "transparent").attr("fill", config.stroke).attr("font-size", "12px")
+            .attr("text-anchor", "middle")
+            .style("opacity", config.opacity)
+            .text(100 * elem / dimension.scale);
+    });
+}
+
 chart.selectAll(".dimension-point")
     .data(dimensionPoints)
     .enter()

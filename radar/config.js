@@ -45,7 +45,7 @@ var config = {
         },
         {
             name: "客流量",
-            scale: 5,
+            scale: 10,
             icon: ""
         }
     ]
