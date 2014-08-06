@@ -17,7 +17,7 @@ var radius = config.radius;
 ///////////////////////
 
 chart.selectAll(".circle")
-    .data([0, 0.4, 0.6, 0.8, 1.0, 1.3].reverse())
+    .data([0, 0.4, 0.6, 0.8, 1.0, 1.2].reverse())
     .enter()
     .append("svg:circle")
     .attr("cx", 0)
@@ -29,6 +29,9 @@ chart.selectAll(".circle")
     .attr("stroke-width", 1)
     .attr("r", function(d, i) {
         return d * radius;
+    })
+    .style("opacity", function(d, i) {
+        return d <= 1 ? config.opacity : 1;
     });
 
 ////////////////////////
@@ -40,8 +43,8 @@ chart.selectAll(".circle")
 var dimensionPoints = config.dimensions.map(function(dimension, index, array) {
     var angle, x, y;
     angle = index / array.length * Math.PI * 2;
-    x = radius * 1.3 * Math.sin(angle);
-    y = radius * 1.3 * Math.cos(angle) * -1;
+    x = radius * 1.2 * Math.sin(angle);
+    y = radius * 1.2 * Math.cos(angle) * -1;
     return {x: x, y: y}
 });
 
@@ -60,22 +63,6 @@ chart.selectAll(".dimension-point")
     .attr("stroke-width", 1)
     .attr("r", 5);
 
-chart.selectAll(".dimension-line")
-    .data(dimensionPoints)
-    .enter()
-    .append("svg:line")
-    .attr("x1", 0)
-    .attr("y1", 0)
-    .attr("x2", function(d, i) {
-        return d.x;
-    })
-    .attr("y2", function(d, i) {
-        return d.y;
-    })
-    .attr("stroke", config.stroke)
-    .attr("fill", config.stroke)
-    .attr("stroke-width", 1)
-
 chart.selectAll(".dimension-text")
     .data(config.dimensions)
     .enter()
@@ -91,3 +78,63 @@ chart.selectAll(".dimension-text")
     .text(function(d, i) {
         return d.name;
     });
+
+////////////////////////
+//
+// Draw data
+//
+////////////////////////
+
+data = window.data;
+
+chart.selectAll(".data")
+    .data(data)
+    .enter()
+    .append("svg:path")
+    .attr("d", function(d, i) {
+        var points = config.dimensions.map(function(dimension, index, array) {
+            var angle, x, y;
+            angle = index / array.length * Math.PI * 2;
+            x = d[dimension.name] * radius * dimension.scale * Math.sin(angle);
+            y = d[dimension.name] * radius * dimension.scale * Math.cos(angle) * -1;
+            return x + " " + y;
+        });
+        return "M" + points.join(" L");
+    })
+    .attr("fill", function(d, i) {
+        return config.colors[i % config.colors.length];
+    })
+    .attr("stroke-width", 0)
+
+////////////////////////
+//
+// Draw dimension line
+//
+////////////////////////
+
+chart.append("svg:circle")
+    .attr("cx", 0)
+    .attr("cy", 0)
+    .attr("stroke", config.stroke)
+    .attr("fill", config.stroke)
+    .style("opacity", config.opacity)
+    .attr("stroke-width", 1)
+    .attr("r", 5);
+
+chart.selectAll(".dimension-line")
+    .data(dimensionPoints)
+    .enter()
+    .append("svg:line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", function(d, i) {
+        return d.x;
+    })
+    .attr("y2", function(d, i) {
+        return d.y;
+    })
+    .attr("stroke", config.stroke)
+    .attr("fill", config.stroke)
+    .style("opacity", config.opacity)
+    .attr("stroke-width", 1)
+
