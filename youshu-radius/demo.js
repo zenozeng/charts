@@ -1,5 +1,3 @@
-// TODO：再调整一下阴影
-
 var config = {
     radius: 220,
     innerRadius: 90,
