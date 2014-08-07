@@ -124,7 +124,7 @@ chart.selectAll(".text")
     });
 
 var fg = chart.append("g")
-        .style("transition", "all 2s");
+        .style("transition", "all 1.5s");
 
 var labels = chart.append("g")
         .style("transition", "all 1s");
